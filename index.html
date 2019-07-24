@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>netoMedia Test</title>
+    <style>
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+}
+.tabs {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+  display: flex;
+}
+.tabs button {
+  background-color: inherit;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+  font-size: 17px;
+}
+.tabs button:hover {
+  background-color: #ddd;
+}
+.formConatianer{
+    background: #e4e4e4;
+    padding: 20px;
+    border: 1px solid #a9a9a9;
+}
+#popupForm{
+       display: none;
+}
+.formConatianer ol {
+    padding-left: 20px;
+}
+.formConatianer li{
+    margin: 10px 0;
+}
+#sendBtn{
+    padding: 15px;
+    background-color: rgb(255, 252, 55);
+    font-weight: bold;
+    font-size: 16px;
+    border: 1px solid #000;
+}
+.tabs .active {
+  background-color: #ccc;
+}
+input {
+  border: 1px solid black;
+}
+input:invalid {
+  border-bottom: 2px solid rgb(207, 0, 0);
+}
+
+
+
+</style>
+</head>
+
+<body>
+            <nav class="pageNav tabs">
+                <button onclick="showForm()">create form</button>     
+            </nav> 
+            <div class="formConatianer">
+                <form id="popupForm">
+                    <h2>Employee</h2>
+                    <ol>
+                        <li>Employee Number: <input type="tel" id="empNum" required pattern="[0-9-]{4,8}" title="the number needs to be btween 4 and 8 letters"/></li>
+                        <li>Employee Name: <input type="text" id="empName" required pattern="[a-zA-Z\s]{1,15}" title="name should have no numbers or spaicel charcther"/></li>
+                        <li>Employee Id: <input type="number" id="empID" required pattern="[0-9]{1,15}" title="id should be only numbers"/></li>
+                        <li>Employee birth day: <input type='date' id="empBd" required/></li>
+                        <li>Employee gender:
+                        <input type="radio" class="empGander" name="gender" value="male" required /> Male
+                        <input type="radio" class="empGander" name="gender" value="female"  /> Female</li>
+                    </ol>
+                    <input type="submit" id="sendBtn" value="Add Employee" onclick="checkForm()">
+                </form>
+                <div class="employeeDetails">
+
+                </div>
+            </div>
+                  
+                
+ <script>
+ function showForm(){
+       document.querySelector('.employeeDetails').style.display = 'none';
+       document.getElementById("popupForm").style.display = 'block';
+ }
+
+ function clearform(){
+       document.getElementById('empNum').value ='';
+       document.getElementById('empName').value ='';
+       document.getElementById('empID').value = '';
+       document.getElementById('empBd').value = '';
+        var els = document.getElementsByClassName('empGander');
+        for(var i=0;i<els.length;i++){
+          els[i].checked = false;
+      }
+       document.getElementById("popupForm").style.display = 'none';
+ }
+
+ function checkForm(){
+    const today = new Date().getFullYear();
+    const yearOfBirth = document.getElementById('empBd').value.split('-');
+    if (today - yearOfBirth[0] < 18){
+        alert(' the employee must be over 18');
+    }else{
+        sendForm();
+        clearform();
+    }
+ }
+ 
+ function sendForm(){
+
+    const objEmployee = {
+       number : document.getElementById('empNum').value,
+       name : document.getElementById('empName').value,
+       id : document.getElementById('empID').value,
+       birthday : document.getElementById('empBd').value,
+       gender : document.querySelector('input[name="gender"]:checked').value
+    }
+
+    localStorage.setItem(`${objEmployee.id}`,JSON.stringify(objEmployee));
+    addBtn(objEmployee);
+ 
+ }
+
+ function addBtn(obj){
+    const markup = ` <button class="employeeBtn" id="btn-${obj.id}" onclick="showDetails(${obj.id})">${obj.name}</button>`;
+    document.querySelector('.tabs').insertAdjacentHTML('beforeend', markup);
+ }
+
+ function showDetails(myid){
+    document.getElementById("popupForm").style.display = 'none';
+    document.querySelector('.employeeDetails').innerHTML = "";
+    const employeeID = myid;
+    const employee = JSON.parse(localStorage.getItem(employeeID));
+    const markup = ` 
+        <div id="div-${employee.id}">
+            <h2>${employee.name}</h2>
+                <ol>
+                    <li><strong>Employee Number: </strong><span>${employee.number}</span></li>
+                    <li><strong>Employee Name: </strong><span>${employee.name}</span></li>
+                    <li><strong>Employee id: </strong><span>${employee.id}</span></li>
+                    <li><strong>Employee Birthday: </strong><span>${employee.birthday}</span></li>
+                    <li><strong>Employee Gender: </strong> <span>${employee.gender}</span></li>
+               </ol>
+           
+        </div>
+        `;
+
+        document.querySelector('.employeeDetails').insertAdjacentHTML("beforeend", markup);
+        document.querySelector('.employeeDetails').style.display = 'block';
+ }
+
+ document.querySelector('.tabs').addEventListener('click', e =>{
+    const tabs = document.getElementsByClassName("employeeBtn");
+        for (i = 0; i < tabs.length; i++) {
+            tabs[i].className = tabs[i].className.replace(" active", "");
+        } 
+    if(e.target.matches('.employeeBtn')){  
+       
+         document.getElementById(e.target.id).className += " active";
+    }
+   
+})
+
+   
+ 
+ </script>                 
+</body>
+</html>
